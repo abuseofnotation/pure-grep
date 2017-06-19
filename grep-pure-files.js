@@ -5,13 +5,27 @@ module.exports = (args) => {
         return {
             action: 'readFile',
             arguments: {file: args.file},
-            callback: (contents) => simpleGrep(contents, {pattern: args.pattern})
+            callback: (contents) => ({
+                action: 'print',                
+                arguments: {
+                    string: simpleGrep(contents, {pattern: args.pattern})
+                },
+                callback: undefined
+
+            })
         }
     } else {
         return {
             action: 'readStdin',
             arguments: {},
-            callback: (input) => simpleGrep(input, args) 
+            callback: (input) => ({
+                action: 'print',                
+                arguments: {
+                    string: simpleGrep(input, {pattern: args.pattern})
+                },
+                callback: undefined
+
+            })
         }
     }
 }
