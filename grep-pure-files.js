@@ -1,31 +1,15 @@
 const simpleGrep = require('./grep-pure')
+const createAction = (action) => (arguments) => ({ action, arguments })
+const readFile = createAction('readFile')
+const readStdin = createAction('readStdin')
+const print = createAction('print')
 
-module.exports = (args) => {
+module.exports = function*(args) {
+    let input;
     if (args.file !== undefined) {
-        return {
-            action: 'readFile',
-            arguments: {file: args.file},
-            callback: (contents) => ({
-                action: 'print',                
-                arguments: {
-                    string: simpleGrep(contents, {pattern: args.pattern})
-                },
-                callback: undefined
-
-            })
-        }
+        input = yield readFile({file: args.file})
     } else {
-        return {
-            action: 'readStdin',
-            arguments: {},
-            callback: (input) => ({
-                action: 'print',                
-                arguments: {
-                    string: simpleGrep(input, {pattern: args.pattern})
-                },
-                callback: undefined
-
-            })
-        }
+        input = yield readStdin()
     }
+    yield print({ string: simpleGrep(input, {pattern: args.pattern}) })
 }
